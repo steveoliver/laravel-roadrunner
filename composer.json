@@ -1,0 +1,60 @@
+{
+    "name": "tarampampam/laravel-roadrunner-in-docker",
+    "type": "project",
+    "description": "Sample Laravel application with RoadRunner in Docker Container",
+    "keywords": ["laravel", "roadrunner"],
+    "license": "MIT",
+    "require": {
+        "php": "^8.1",
+        "fruitcake/laravel-cors": "^3.0.0",
+        "guzzlehttp/guzzle": "^7.5.0",
+        "laravel/framework": "^9.37",
+        "laravel/sanctum": "^3.0",
+        "laravel/tinker": "^2.7",
+        "spiral/roadrunner-laravel": "^5.9"
+    },
+    "require-dev": {
+        "spatie/laravel-ignition": "^1.6",
+        "fakerphp/faker": "^1.20.0",
+        "laravel/sail": "^1.16.2",
+        "mockery/mockery": "^1.5.1",
+        "nunomaduro/collision": "^6.3",
+        "phpstan/phpstan": "^1.8.11",
+        "phpunit/phpunit": "^9.5.26"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+            "@php artisan package:discover --ansi"
+        ],
+        "phpunit": "@php ./vendor/bin/phpunit -d memory_limit=512M",
+        "phpstan": "@php -d 'opcache.enable=0' ./vendor/bin/phpstan analyze -c ./phpstan.neon --no-progress --ansi",
+        "test": [
+            "@phpstan",
+            "@phpunit"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "dont-discover": []
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "prefer-stable": true
+}
