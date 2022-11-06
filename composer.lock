@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e2ee6ca28d2609dd9935cc24d5c8475c",
+    "content-hash": "62e710cf629a2b2dbef16bd03c12ffd2",
     "packages": [
         {
             "name": "brick/math",
@@ -1768,6 +1768,73 @@
             "time": "2022-04-17T13:12:02+00:00"
         },
         {
+            "name": "lkaemmerling/laravel-horizon-prometheus-exporter",
+            "version": "v1.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/LKaemmerling/laravel-horizon-prometheus-exporter.git",
+                "reference": "04f28da60c55e820692c9dcd5b9a77b605b08b0a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/LKaemmerling/laravel-horizon-prometheus-exporter/zipball/04f28da60c55e820692c9dcd5b9a77b605b08b0a",
+                "reference": "04f28da60c55e820692c9dcd5b9a77b605b08b0a",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/config": "^6.0|^7.0|^8.0|^9.0",
+                "illuminate/routing": "^6.0|^7.0|^8.0|^9.0",
+                "illuminate/support": "^6.0|^7.0|^8.0|^9.0",
+                "laravel/horizon": "^4.0|^5.0",
+                "php": "^7.1|^8.0",
+                "promphp/prometheus_client_php": "^1.0.3|^2.0.0"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^v4.9|^5.3|^6.3|^7.0",
+                "phpunit/phpunit": "^8.2|^9.0",
+                "symfony/var-dumper": "^4.3|^5.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "LKDevelopment\\HorizonPrometheusExporter\\HorizonPrometheusExporterServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "LKDevelopment\\HorizonPrometheusExporter\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Lukas Kämmerling",
+                    "email": "kontakt@lukas-kaemmerling.de",
+                    "homepage": "https://lukas-kaemmerling.de",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A small package to gain and export long time information from Laravel & Horizon for Prometheus.",
+            "homepage": "https://github.com/lkaemmerling/laravel-horizon-prometheus-exporter",
+            "keywords": [
+                "exporter",
+                "horizon",
+                "laravel",
+                "laravel-horizon-prometheus-exporter",
+                "prometheus"
+            ],
+            "support": {
+                "issues": "https://github.com/LKaemmerling/laravel-horizon-prometheus-exporter/issues",
+                "source": "https://github.com/LKaemmerling/laravel-horizon-prometheus-exporter/tree/v1.5.0"
+            },
+            "time": "2022-10-14T14:11:44+00:00"
+        },
+        {
             "name": "monolog/monolog",
             "version": "2.8.0",
             "source": {
@@ -2465,6 +2532,73 @@
                 }
             ],
             "time": "2022-07-30T15:51:26+00:00"
+        },
+        {
+            "name": "promphp/prometheus_client_php",
+            "version": "v2.6.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/PromPHP/prometheus_client_php.git",
+                "reference": "df77bbcc65bd173f2ffaf40ab4e1ca8716da8ce6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/PromPHP/prometheus_client_php/zipball/df77bbcc65bd173f2ffaf40ab4e1ca8716da8ce6",
+                "reference": "df77bbcc65bd173f2ffaf40ab4e1ca8716da8ce6",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "php": "^7.2|^8.0"
+            },
+            "replace": {
+                "endclothing/prometheus_client_php": "*",
+                "jimdo/prometheus_client_php": "*",
+                "lkaemmerling/prometheus_client_php": "*"
+            },
+            "require-dev": {
+                "guzzlehttp/guzzle": "^6.3|^7.0",
+                "phpstan/extension-installer": "^1.0",
+                "phpstan/phpstan": "^1.5.4",
+                "phpstan/phpstan-phpunit": "^1.1.0",
+                "phpstan/phpstan-strict-rules": "^1.1.0",
+                "phpunit/phpunit": "^9.4",
+                "squizlabs/php_codesniffer": "^3.6",
+                "symfony/polyfill-apcu": "^1.6"
+            },
+            "suggest": {
+                "ext-apc": "Required if using APCu.",
+                "ext-redis": "Required if using Redis.",
+                "promphp/prometheus_push_gateway_php": "An easy client for using Prometheus PushGateway.",
+                "symfony/polyfill-apcu": "Required if you use APCu on PHP8.0+"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Prometheus\\": "src/Prometheus/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Lukas Kämmerling",
+                    "email": "kontakt@lukas-kaemmerling.de"
+                }
+            ],
+            "description": "Prometheus instrumentation library for PHP applications.",
+            "support": {
+                "issues": "https://github.com/PromPHP/prometheus_client_php/issues",
+                "source": "https://github.com/PromPHP/prometheus_client_php/tree/v2.6.2"
+            },
+            "time": "2022-06-30T03:46:23+00:00"
         },
         {
             "name": "psr/container",
