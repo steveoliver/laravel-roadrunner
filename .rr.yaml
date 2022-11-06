@@ -19,7 +19,7 @@ server:
   # Worker starting command, with any required arguments.
   #
   # This option is required.
-  command: "php ./vendor/bin/rr-worker start --relay-dsn unix:///var/run/rr/rr-relay.sock"
+  command: "php ./vendor/bin/rr-worker start"
 
   ## Environment variables for the worker processes.
   ##
