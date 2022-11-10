@@ -48,6 +48,9 @@ RUN set -x \
         1>/dev/null \
     && pecl install -o redis 1>/dev/null \
     && echo 'extension=redis.so' > ${PHP_INI_DIR}/conf.d/redis.ini \
+    # install xdebug extension
+    && pecl install -o xdebug 1>/dev/null \
+    && echo 'extension=xdebug.so' > ${PHP_INI_DIR}/conf.d/xdebug.ini \
     # install supercronic (for laravel task scheduling), project page: <https://github.com/aptible/supercronic>
     && wget -q "https://github.com/aptible/supercronic/releases/download/v0.1.12/supercronic-linux-amd64" \
          -O /usr/bin/supercronic \
