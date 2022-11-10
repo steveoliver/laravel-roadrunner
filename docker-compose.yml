@@ -9,7 +9,7 @@ volumes:
 
 services:
   app: &app
-    image: steveoliver/laravel-roadrunner:v0.0.5
+    image: steveoliver/laravel-roadrunner:v0.0.9
     # build:
     #   context: .
     #   dockerfile: Dockerfile
