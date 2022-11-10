@@ -21,7 +21,7 @@ server:
   # Worker starting command, with any required arguments.
   #
   # This option is required.
-  command: "php ./vendor/bin/rr-worker start --relay-dsn unix:///var/run/rr/rr-relay.sock"
+  command: "php -d zend_extension=xdebug ./vendor/bin/rr-worker start --relay-dsn unix:///var/run/rr/rr-relay.sock"
 
   ## Environment variables for the worker processes.
   ##
@@ -29,6 +29,9 @@ server:
   #env:
   #  - SOME_KEY: "SOME_VALUE"
   #  - SOME_KEY2: "SOME_VALUE2"
+  env:
+    - PHP_IDE_CONFIG: serverName=localhost
+    - XDEBUG_CONFIG: remote_host=localhost max_nesting_level=250 remote_enable=1 remote_connect_back=0 var_display_max_depth=5 idekey='PHPSTORM'
 
   # Worker relay can be: "pipes", TCP (eg.: tcp://127.0.0.1:6001), or socket (eg.: unix:///var/run/rr-relay.sock).
   #
