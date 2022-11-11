@@ -150,16 +150,17 @@ jobs: # Docs: <https://help.github.com/en/articles/workflow-syntax-for-github-ac
       - name: Create docker network
         run: docker network create "app-network"
 
-      - name: Start postgres server
+      - name: Start mariadb server
         run: |
           docker run --rm -d \
             --network "app-network" \
-            --name=postgres \
-            -p "5432/tcp" \
-            -e "POSTGRES_DB=forge" \
-            -e "POSTGRES_USER=forge" \
-            -e "POSTGRES_PASSWORD=forge" \
-              postgres:15-alpine
+            --name=mariadb \
+            -p "3306/tcp" \
+            -e "MARIADB_DATABASE=forge" \
+            -e "MARIADB_USER=forge" \
+            -e "MARIADB_PASSWORD=forge" \
+            -e "MARIADB_ROOT_PASSWORD=forge" \
+              mariadb:latest
 
       - name: Start redis server
         run: |
