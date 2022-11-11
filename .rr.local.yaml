@@ -38,7 +38,7 @@ server:
     # PHP_IDE_CONFIG servername must match IDE's server name.
     - PHP_IDE_CONFIG: serverName=localhost
     - XDEBUG_SESSION: PHPSTORM
-    - XDEBUG_MODE: off
+    - XDEBUG_MODE: off # debug
     - XDEBUG_TRIGGER: XDEBUG_TRIGGER
 
   # Worker relay can be: "pipes", TCP (eg.: tcp://127.0.0.1:6001), or socket (eg.: unix:///var/run/rr-relay.sock).
