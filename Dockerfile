@@ -28,6 +28,7 @@ ENV COMPOSER_HOME="/tmp/composer"
 RUN set -x \
     # install permanent dependencies
     && apk add --no-cache \
+        postgresql-libs \
         mariadb-client \
         icu-libs \
     # install build-time dependencies
