@@ -43,12 +43,12 @@ jobs: # Docs: <https://help.github.com/en/articles/workflow-syntax-for-github-ac
 
       - name: Get Composer Cache Directory # Docs: <https://git.io/JfAKn#php---composer>
         id: composer-cache
-        run: echo "{dir}={$(composer config cache-files-dir)}" >> $GITHUB_OUTPUT
+        run: echo "DIR=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache dependencies # Docs: <https://git.io/JfAKn#php---composer>
         uses: actions/cache@v3
         with:
-          path: ${{ steps.composer-cache.outputs.dir }}
+          path: ${{ steps.composer-cache.outputs.DIR }}
           key: ${{ runner.os }}-composer-${{ matrix.setup }}-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
 
@@ -73,12 +73,12 @@ jobs: # Docs: <https://help.github.com/en/articles/workflow-syntax-for-github-ac
 
       - name: Get Composer Cache Directory
         id: composer-cache
-        run: echo "{dir}={$(composer config cache-files-dir)}" >> $GITHUB_OUTPUT
+        run: echo "DIR=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache dependencies
         uses: actions/cache@v3
         with:
-          path: ${{ steps.composer-cache.outputs.dir }}
+          path: ${{ steps.composer-cache.outputs.DIR }}
           key: ${{ runner.os }}-composer-${{ matrix.setup }}-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
 
@@ -225,7 +225,7 @@ jobs: # Docs: <https://help.github.com/en/articles/workflow-syntax-for-github-ac
 
       - name: Generate values for tests running
         id: values
-        run: echo "::set-output name=base_url::`[ "${{ matrix.ssl }}" = "on" ] && echo "https://localhost:8443" || echo "http://localhost:8080"`"
+        run: echo "BASE_URL=`[ "${{ matrix.ssl }}" = "on" ] && echo "https://localhost:8443" || echo "http://localhost:8080"`" >> $GITHUB_OUTPUT
 
       # Image page: <https://hub.docker.com/r/postman/newman>,
       # CLI options: <https://www.npmjs.com/package/newman#command-line-options>
@@ -236,6 +236,6 @@ jobs: # Docs: <https://help.github.com/en/articles/workflow-syntax-for-github-ac
             --volume "$(pwd):/rootfs:ro" \
             --workdir "/rootfs/tests/postman" \
               postman/newman:5.2-alpine run ./default.postman_collection.json \
-                --env-var "base_url=${{ steps.values.outputs.base_url }}" \
+                --env-var "base_url=${{ steps.values.outputs.BASE_URL }}" \
                 --insecure \
                 --color on
