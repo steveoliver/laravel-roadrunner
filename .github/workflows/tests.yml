@@ -205,7 +205,7 @@ jobs: # Docs: <https://help.github.com/en/articles/workflow-syntax-for-github-ac
             -e "DB_USERNAME=forge" \
             -e "DB_PASSWORD=forge" \
               app:local \
-                php artisan queue:work --memory=256 --sleep=1
+                php artisan horizon
 
       - name: Start application HTTP server
         run: |
