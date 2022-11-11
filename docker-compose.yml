@@ -3,13 +3,13 @@
 version: '3.8'
 
 volumes:
-  pg-data: {}
+  db-data: {}
   redis-data: {}
   tmp-data: {}
 
 services:
   app: &app
-    image: steveoliver/laravel-roadrunner:v0.0.12
+    image: steveoliver/laravel-roadrunner:v0.0.19
     # build:
     #   context: .
     #   dockerfile: Dockerfile
@@ -21,6 +21,7 @@ services:
       APP_ENV: local
       REDIS_HOST: redis
       REDIS_PASSWORD: redis_password
+      DB_CONNECTION: mysql
       DB_HOST: mariadb
       DB_DATABASE: forge
       DB_USERNAME: forge
@@ -60,6 +61,7 @@ services:
     environment:
       MARIADB_USER: forge
       MARIADB_PASSWORD: forge
+      MARIADB_DATABASE: forge
       MARIADB_ROOT_PASSWORD: forge
       MARIADB_PORT: 3306
     volumes:
