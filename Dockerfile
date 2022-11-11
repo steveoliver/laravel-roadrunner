@@ -33,6 +33,7 @@ RUN set -x \
         icu-libs \
     # install build-time dependencies
     && apk add --no-cache --virtual .build-deps \
+        postgresql-dev \
         autoconf \
         openssl \
         make \
