@@ -184,7 +184,8 @@ jobs: # Docs: <https://help.github.com/en/articles/workflow-syntax-for-github-ac
         run: |
           docker run --rm \
             --network "app-network" \
-            -e "DB_HOST=postgres" \
+            -e "DB_CONNECTION=mysql" \
+            -e "DB_HOST=mariadb" \
             -e "DB_DATABASE=forge" \
             -e "DB_USERNAME=forge" \
             -e "DB_PASSWORD=forge" \
@@ -197,7 +198,8 @@ jobs: # Docs: <https://help.github.com/en/articles/workflow-syntax-for-github-ac
             --network "app-network" \
             -e "REDIS_HOST=redis" \
             -e "REDIS_PASSWORD=redis_password" \
-            -e "DB_HOST=postgres" \
+            -e "DB_CONNECTION=mysql" \
+            -e "DB_HOST=mariadb" \
             -e "DB_DATABASE=forge" \
             -e "DB_USERNAME=forge" \
             -e "DB_PASSWORD=forge" \
@@ -212,7 +214,8 @@ jobs: # Docs: <https://help.github.com/en/articles/workflow-syntax-for-github-ac
             -p "8443:8443/tcp" \
             -e "REDIS_HOST=redis" \
             -e "REDIS_PASSWORD=redis_password" \
-            -e "DB_HOST=postgres" \
+            -e "DB_CONNECTION=mysql" \
+            -e "DB_HOST=mariadb" \
             -e "DB_DATABASE=forge" \
             -e "DB_USERNAME=forge" \
             -e "DB_PASSWORD=forge" \
