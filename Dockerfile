@@ -43,7 +43,6 @@ RUN set -x \
         opcache \
         pcntl \
         intl \
-        1>/dev/null \
     && pecl install -o redis 1>/dev/null \
     && echo 'extension=redis.so' > ${PHP_INI_DIR}/conf.d/redis.ini \
     # install xdebug extension (but do not enable it; only enable at runtime, as needed)
