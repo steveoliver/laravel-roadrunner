@@ -21,10 +21,11 @@ services:
       APP_ENV: local
       REDIS_HOST: redis
       REDIS_PASSWORD: redis_password
-      DB_HOST: postgres
+      DB_HOST: mariadb
       DB_DATABASE: forge
       DB_USERNAME: forge
       DB_PASSWORD: forge
+      DB_PORT: 3306
       QUEUE_CONNECTION: redis
     volumes:
       - /etc/passwd:/etc/passwd:ro
@@ -32,7 +33,7 @@ services:
       - tmp-data:/tmp:rw
       - .:/app:rw
     depends_on:
-      postgres: {condition: service_healthy}
+      mariadb: {condition: service_healthy}
       redis: {condition: service_healthy}
 
   web:
@@ -54,18 +55,19 @@ services:
     <<: *app
     command: supercronic /etc/supercronic/laravel # it runs artisan schedule:run
 
-  postgres:
-    image: postgres:15-alpine # Image page: <https://hub.docker.com/_/postgres>
+  mariadb:
+    image: mariadb:latest # Image page: <https://hub.docker.com/_/mariadb>
     environment:
-      POSTGRES_DB: forge
-      POSTGRES_USER: forge
-      POSTGRES_PASSWORD: forge
+      MARIADB_USER: forge
+      MARIADB_PASSWORD: forge
+      MARIADB_ROOT_PASSWORD: forge
+      MARIADB_PORT: 3306
     volumes:
-      - pg-data:/var/lib/postgresql/data:rw
+      - db-data:/var/lib/mysql:rw
     ports:
-      - '5432/tcp'
+      - '3306/tcp'
     healthcheck: # Healthcheck docs: <https://docs.docker.com/engine/reference/builder/#healthcheck>
-      test: ['CMD-SHELL', 'pg_isready -U forge']
+      test: ['CMD-SHELL', "mysqladmin ping -P $$(echo $$MARIADB_PORT) -p$$(echo $$MARIADB_ROOT_PASSWORD) | grep 'mysqld is alive' || exit 1"]
       interval: 2s
       timeout: 5s
       start_period: 2s

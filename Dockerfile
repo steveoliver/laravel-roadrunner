@@ -28,19 +28,17 @@ ENV COMPOSER_HOME="/tmp/composer"
 RUN set -x \
     # install permanent dependencies
     && apk add --no-cache \
-        postgresql-libs \
+        mariadb-client \
         icu-libs \
     # install build-time dependencies
     && apk add --no-cache --virtual .build-deps \
-        postgresql-dev \
         autoconf \
         openssl \
         make \
         g++ \
-        git \
     # install PHP extensions (CFLAGS usage reason - https://bit.ly/3ALS5NU)
     && CFLAGS="$CFLAGS -D_GNU_SOURCE" docker-php-ext-install -j$(nproc) \
-        pdo_pgsql \
+        pdo_mysql \
         sockets \
         opcache \
         pcntl \
