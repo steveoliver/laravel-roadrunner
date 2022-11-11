@@ -35,7 +35,7 @@ RUN set -x \
         autoconf \
         openssl \
         make \
-        g++ \
+        g++
 RUN set -X \
     # install PHP extensions (CFLAGS usage reason - https://bit.ly/3ALS5NU)
     && CFLAGS="$CFLAGS -D_GNU_SOURCE" docker-php-ext-install -j$(nproc) \
