@@ -12,13 +12,13 @@
 #        && NODE_ENV="production" yarn run prod
 
 # fetch the RoadRunner image, image page: <https://hub.docker.com/r/spiralscout/roadrunner>
-FROM spiralscout/roadrunner:2.11.4 as roadrunner
+# FROM spiralscout/roadrunner:2.11.4 as roadrunner
 
 # fetch the Composer image, image page: <https://hub.docker.com/_/composer>
 FROM composer:2.4.4 as composer
 
 # build application runtime, image page: <https://hub.docker.com/_/php>
-FROM php:8.1.12-alpine as runtime
+FROM php:8.1.12-fpm-alpine as runtime
 
 # install composer, image page: <https://hub.docker.com/_/composer>
 COPY --from=composer /usr/bin/composer /usr/bin/composer
@@ -31,6 +31,7 @@ RUN set -x \
         postgresql-libs \
         mariadb-client \
         icu-libs \
+        nginx \
     # install build-time dependencies
     && apk add --no-cache --virtual .build-deps \
         postgresql-dev \
@@ -87,7 +88,7 @@ RUN set -x \
     && chmod -R 777 /var/run/rr
 
 # install roadrunner
-COPY --from=roadrunner /usr/bin/rr /usr/bin/rr
+# COPY --from=roadrunner /usr/bin/rr /usr/bin/rr
 
 # use an unprivileged user by default
 USER appuser:appuser
