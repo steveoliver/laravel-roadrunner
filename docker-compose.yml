@@ -37,14 +37,26 @@ services:
       mariadb: {condition: service_healthy}
       redis: {condition: service_healthy}
 
-  web:
+  nginx:
     <<: *app
-    command: rr serve -c .rr.local.yaml
+    command: nginx
     ports:
       - '8080:8080/tcp'
       - '8443:8443/tcp'
     healthcheck:
-      test: ['CMD-SHELL', 'wget --spider -q "http://127.0.0.1:8082/health?plugin=http&plugin=rpc"']
+      test: ['CMD', 'wget "http://127.0.0.1/"']
+      interval: 2s
+      timeout: 2s
+    depends_on:
+      php-fpm: {condition: service_healthy}
+
+  php-fpm:
+    <<: *app
+    command: php-fpm
+    ports:
+      - '9000/tcp'
+    healthcheck:
+      test: ['CMD', 'php-fpm-healthcheck || exit 1']
       interval: 2s
       timeout: 2s
 

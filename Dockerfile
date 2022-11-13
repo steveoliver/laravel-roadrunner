@@ -11,19 +11,14 @@
 #        && yarn install --frozen-lockfile --no-progress --non-interactive \
 #        && NODE_ENV="production" yarn run prod
 
-# fetch the RoadRunner image, image page: <https://hub.docker.com/r/spiralscout/roadrunner>
-# FROM spiralscout/roadrunner:2.11.4 as roadrunner
-
 # fetch the Composer image, image page: <https://hub.docker.com/_/composer>
 FROM composer:2.4.4 as composer
 
 # build application runtime, image page: <https://hub.docker.com/_/php>
 FROM php:8.1.12-fpm-alpine as runtime
 
-# install composer, image page: <https://hub.docker.com/_/composer>
-COPY --from=composer /usr/bin/composer /usr/bin/composer
-
-ENV COMPOSER_HOME="/tmp/composer"
+ARG PHP_CONTAINER=php-fpm
+ARG PHP_PORT=9000
 
 RUN set -x \
     # install permanent dependencies
@@ -39,6 +34,7 @@ RUN set -x \
         openssl \
         make \
         g++
+
 RUN set -x \
     # install PHP extensions (CFLAGS usage reason - https://bit.ly/3ALS5NU)
     && CFLAGS="$CFLAGS -D_GNU_SOURCE" docker-php-ext-install -j$(nproc) \
@@ -51,6 +47,18 @@ RUN set -x \
     && echo 'extension=redis.so' > ${PHP_INI_DIR}/conf.d/redis.ini \
     # install xdebug extension (but do not enable it; only enable at runtime, as needed)
     && pecl install -o xdebug 1>/dev/null \
+    # enable opcache for CLI and JIT, docs: <https://www.php.net/manual/en/opcache.configuration.php#ini.opcache.jit>
+    && echo -e "\nopcache.enable=1\nopcache.enable_cli=1\nopcache.jit_buffer_size=32M\nopcache.jit=1235\n" >> \
+        ${PHP_INI_DIR}/conf.d/docker-php-ext-opcache.ini \
+    # provide the ability to check the health of php-fpm, docs: <https://github.com/renatomefi/php-fpm-healthcheck>
+    && wget -O /usr/local/bin/php-fpm-healthcheck \
+       https://raw.githubusercontent.com/renatomefi/php-fpm-healthcheck/master/php-fpm-healthcheck \
+       && chmod +x /usr/local/bin/php-fpm-healthcheck \
+    # add php-fpm upstream for nginx
+    && echo "upstream php-upstream { server ${PHP_CONTAINER}:${PHP_PORT}; }" > /etc/nginx/conf.d/upstream.conf \
+           && rm /etc/nginx/conf.d/default.conf \
+    # show installed PHP modules
+    && php -m \
     # install supercronic (for laravel task scheduling), project page: <https://github.com/aptible/supercronic>
     && wget -q "https://github.com/aptible/supercronic/releases/download/v0.1.12/supercronic-linux-amd64" \
          -O /usr/bin/supercronic \
@@ -61,18 +69,9 @@ RUN set -x \
     && openssl req -x509 -nodes -days 1095 -newkey rsa:2048 \
         -subj "/C=CA/ST=QC/O=Company, Inc./CN=mydomain.com" \
         -addext "subjectAltName=DNS:mydomain.com" \
-        -keyout /etc/ssl/private/selfsigned.key \
-        -out /etc/ssl/certs/selfsigned.crt \
-    && chmod 644 /etc/ssl/private/selfsigned.key \
-    # make clean up
-    && docker-php-source delete \
-    && apk del .build-deps \
-    && rm -R /tmp/pear \
-    # enable opcache for CLI and JIT, docs: <https://www.php.net/manual/en/opcache.configuration.php#ini.opcache.jit>
-    && echo -e "\nopcache.enable=1\nopcache.enable_cli=1\nopcache.jit_buffer_size=32M\nopcache.jit=1235\n" >> \
-        ${PHP_INI_DIR}/conf.d/docker-php-ext-opcache.ini \
-    # show installed PHP modules
-    && php -m \
+        -keyout /etc/nginx/ssl/default.key \
+        -out /etc/nginx/ssl/default.crt \
+    && chmod 644 /etc/nginx/ssl/default.key \
     # create unprivileged user
     && adduser \
         --disabled-password \
@@ -82,19 +81,21 @@ RUN set -x \
         --uid "10001" \
         --gecos "" \
         "appuser" \
-    # create directory for application sources and roadrunner unix socket
-    && mkdir /app /var/run/rr \
-    && chown -R appuser:appuser /app /var/run/rr \
-    && chmod -R 777 /var/run/rr
+    # create directory for application sources
+    && mkdir /app \
+    && chown -R appuser:appuser /app \
+    # make clean up
+    && docker-php-source delete \
+    && apk del .build-deps \
+    && rm -R /tmp/pear \
 
-# install roadrunner
-# COPY --from=roadrunner /usr/bin/rr /usr/bin/rr
+# add php-fpm customizations
+COPY .build/php-fpm/laravel.ini /usr/local/etc/php/conf.d/
 
-# use an unprivileged user by default
-USER appuser:appuser
+# install composer, image page: <https://hub.docker.com/_/composer>
+COPY --from=composer /usr/bin/composer /usr/bin/composer
 
-# use directory with application sources by default
-WORKDIR /app
+ENV COMPOSER_HOME="/tmp/composer"
 
 # copy composer (json|lock) files for dependencies layer caching
 COPY --chown=appuser:appuser ./composer.* /app/
@@ -115,6 +116,17 @@ RUN set -x \
     && chmod -R 777 ${COMPOSER_HOME}/cache \
     # create the symbolic links configured for the application
     && php ./artisan storage:link
+
+# load custom nginx.conf
+COPY .build/nginx/nginx.conf /etc/nginx/
+
+COPY .build/nginx/site.conf /etc/nginx/sites-available/default.conf
+
+# use an unprivileged user by default
+USER appuser:appuser
+
+# use directory with application sources by default
+WORKDIR /app
 
 # unset default image entrypoint
 ENTRYPOINT []
