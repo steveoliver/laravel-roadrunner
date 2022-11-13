@@ -27,6 +27,7 @@ RUN set -x \
         mariadb-client \
         icu-libs \
         nginx \
+        fcgi \
     # install build-time dependencies
     && apk add --no-cache --virtual .build-deps \
         postgresql-dev \
@@ -79,7 +80,7 @@ RUN set -x \
         --gecos "" \
         "appuser" \
     # create directory for application sources
-    && mkdir -P /app /var/lib/nginx/logs/ \
+    && mkdir -p /app /var/lib/nginx/logs/ \
     && chown -R appuser:appuser /app /var/lib/nginx/logs/ \
     # make clean up
     && docker-php-source delete \
