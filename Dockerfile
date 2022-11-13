@@ -79,8 +79,8 @@ RUN set -x \
         --gecos "" \
         "appuser" \
     # create directory for application sources
-    && mkdir /app \
-    && chown -R appuser:appuser /app \
+    && mkdir -P /app /var/lib/nginx/logs/ \
+    && chown -R appuser:appuser /app /var/lib/nginx/logs/ \
     # make clean up
     && docker-php-source delete \
     && apk del .build-deps \
