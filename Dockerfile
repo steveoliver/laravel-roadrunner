@@ -117,11 +117,10 @@ RUN set -x \
 # load custom nginx.conf
 COPY .build/nginx/nginx.conf /etc/nginx/
 
-RUN  mkdir -p /etc/nginx/conf.d \
-    # add php-fpm upstream for nginx
-    && echo "upstream php-upstream { server ${PHP_CONTAINER}:${PHP_PORT}; }" > /etc/nginx/conf.d/upstream.conf
+# add php-fpm upstream for nginx
+RUN echo "upstream php-upstream { server ${PHP_CONTAINER}:${PHP_PORT}; }" > /etc/nginx/http.d/upstream.conf
 
-COPY .build/nginx/site.conf /etc/nginx/conf.d/default.conf
+COPY .build/nginx/site.conf /etc/nginx/http.d/default.conf
 
 # use an unprivileged user by default
 USER appuser:appuser
