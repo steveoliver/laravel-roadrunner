@@ -54,9 +54,6 @@ RUN set -x \
     && wget -O /usr/local/bin/php-fpm-healthcheck \
        https://raw.githubusercontent.com/renatomefi/php-fpm-healthcheck/master/php-fpm-healthcheck \
        && chmod +x /usr/local/bin/php-fpm-healthcheck \
-    # add php-fpm upstream for nginx
-    && echo "upstream php-upstream { server ${PHP_CONTAINER}:${PHP_PORT}; }" > /etc/nginx/conf.d/upstream.conf \
-           && rm /etc/nginx/conf.d/default.conf \
     # show installed PHP modules
     && php -m \
     # install supercronic (for laravel task scheduling), project page: <https://github.com/aptible/supercronic>
@@ -120,7 +117,11 @@ RUN set -x \
 # load custom nginx.conf
 COPY .build/nginx/nginx.conf /etc/nginx/
 
-COPY .build/nginx/site.conf /etc/nginx/sites-available/default.conf
+RUN  mkdir -p /etc/nginx/conf.d \
+    # add php-fpm upstream for nginx
+    && echo "upstream php-upstream { server ${PHP_CONTAINER}:${PHP_PORT}; }" > /etc/nginx/conf.d/upstream.conf
+
+COPY .build/nginx/site.conf /etc/nginx/conf.d/default.conf
 
 # use an unprivileged user by default
 USER appuser:appuser
