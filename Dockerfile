@@ -84,7 +84,7 @@ RUN set -x \
     # make clean up
     && docker-php-source delete \
     && apk del .build-deps \
-    && rm -R /tmp/pear \
+    && rm -R /tmp/pear
 
 # add php-fpm customizations
 COPY .build/php-fpm/laravel.ini /usr/local/etc/php/conf.d/
