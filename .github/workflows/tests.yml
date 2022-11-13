@@ -207,12 +207,11 @@ jobs: # Docs: <https://help.github.com/en/articles/workflow-syntax-for-github-ac
               app:local \
                 php artisan horizon
 
-      - name: Start application HTTP server
+      - name: Start php-fpm
         run: |
           docker run --rm -d \
             --network "app-network" \
-            -p "8080:8080/tcp" \
-            -p "8443:8443/tcp" \
+            -p "9000/tcp" \
             -e "REDIS_HOST=redis" \
             -e "REDIS_PASSWORD=redis_password" \
             -e "DB_CONNECTION=mysql" \
@@ -221,7 +220,23 @@ jobs: # Docs: <https://help.github.com/en/articles/workflow-syntax-for-github-ac
             -e "DB_USERNAME=forge" \
             -e "DB_PASSWORD=forge" \
               app:local \
-                rr serve -c .rr.yaml
+                php-fpm
+
+      - name: Start nginx
+        run: |
+          docker run --rm -d \
+            --network "app-network" \
+            -p "80:8080/tcp" \
+            -p "443:8443/tcp" \
+            -e "REDIS_HOST=redis" \
+            -e "REDIS_PASSWORD=redis_password" \
+            -e "DB_CONNECTION=mysql" \
+            -e "DB_HOST=mariadb" \
+            -e "DB_DATABASE=forge" \
+            -e "DB_USERNAME=forge" \
+            -e "DB_PASSWORD=forge" \
+              app:local \
+                nginx
 
       - name: Generate values for tests running
         id: values
