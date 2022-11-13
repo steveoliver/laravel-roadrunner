@@ -89,22 +89,8 @@ RUN set -x \
 # add php-fpm customizations
 COPY .build/php-fpm/laravel.ini /usr/local/etc/php/conf.d/
 
-# install composer, image page: <https://hub.docker.com/_/composer>
-COPY --from=composer /usr/bin/composer /usr/bin/composer
-
-ENV COMPOSER_HOME="/tmp/composer"
-
 # copy composer (json|lock) files for dependencies layer caching
 COPY --chown=appuser:appuser ./composer.* /app/
-
-# install composer dependencies (autoloader MUST be generated later!)
-RUN composer install -n --no-dev --no-cache --no-ansi --no-autoloader --no-scripts --prefer-dist
-
-# copy application sources into image (completely)
-COPY --chown=appuser:appuser . /app/
-
-#    # copy front-end artifacts into image
-#    COPY --from=frontend --chown=appuser:appuser /app/public /app/public
 
 RUN set -x \
     # generate composer autoloader and trigger scripts
@@ -122,11 +108,25 @@ RUN echo "upstream php-upstream { server ${PHP_CONTAINER}:${PHP_PORT}; }" > /etc
 
 COPY .build/nginx/site.conf /etc/nginx/http.d/default.conf
 
-# use an unprivileged user by default
-USER appuser:appuser
-
 # use directory with application sources by default
 WORKDIR /app
+
+# install composer, image page: <https://hub.docker.com/_/composer>
+COPY --from=composer /usr/bin/composer /usr/bin/composer
+
+ENV COMPOSER_HOME="/tmp/composer"
+
+# install composer dependencies (autoloader MUST be generated later!)
+RUN composer install -n --no-dev --no-cache --no-ansi --no-autoloader --no-scripts --prefer-dist
+
+# copy application sources into image (completely)
+COPY --chown=appuser:appuser . /app/
+
+#    # copy front-end artifacts into image
+#    COPY --from=frontend --chown=appuser:appuser /app/public /app/public
+
+# use an unprivileged user by default
+USER appuser:appuser
 
 # unset default image entrypoint
 ENTRYPOINT []
