@@ -92,14 +92,6 @@ COPY .build/php-fpm/laravel.ini /usr/local/etc/php/conf.d/
 # copy composer (json|lock) files for dependencies layer caching
 COPY --chown=appuser:appuser ./composer.* /app/
 
-RUN set -x \
-    # generate composer autoloader and trigger scripts
-    && composer dump-autoload -n --optimize \
-    # "fix" composer issue "Cannot create cache directory /tmp/composer/cache/..." for docker-compose usage
-    && chmod -R 777 ${COMPOSER_HOME}/cache \
-    # create the symbolic links configured for the application
-    && php ./artisan storage:link
-
 # load custom nginx.conf
 COPY .build/nginx/nginx.conf /etc/nginx/
 
@@ -121,6 +113,14 @@ RUN composer install -n --no-dev --no-cache --no-ansi --no-autoloader --no-scrip
 
 # copy application sources into image (completely)
 COPY --chown=appuser:appuser . /app/
+
+RUN set -x \
+    # generate composer autoloader and trigger scripts
+    && composer dump-autoload -n --optimize \
+    # "fix" composer issue "Cannot create cache directory /tmp/composer/cache/..." for docker-compose usage
+    && chmod -R 777 ${COMPOSER_HOME}/cache \
+    # create the symbolic links configured for the application
+    && php ./artisan storage:link
 
 #    # copy front-end artifacts into image
 #    COPY --from=frontend --chown=appuser:appuser /app/public /app/public
