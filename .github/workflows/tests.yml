@@ -226,8 +226,8 @@ jobs: # Docs: <https://help.github.com/en/articles/workflow-syntax-for-github-ac
         run: |
           docker run --rm -d \
             --network "app-network" \
-            -p "80:8080/tcp" \
-            -p "443:8443/tcp" \
+            -p "80:80/tcp" \
+            -p "443:443/tcp" \
             -e "REDIS_HOST=redis" \
             -e "REDIS_PASSWORD=redis_password" \
             -e "DB_CONNECTION=mysql" \
@@ -240,7 +240,7 @@ jobs: # Docs: <https://help.github.com/en/articles/workflow-syntax-for-github-ac
 
       - name: Generate values for tests running
         id: values
-        run: echo "BASE_URL=`[ "${{ matrix.ssl }}" = "on" ] && echo "https://localhost:8443" || echo "http://localhost:8080"`" >> $GITHUB_OUTPUT
+        run: echo "BASE_URL=`[ "${{ matrix.ssl }}" = "on" ] && echo "https://localhost" || echo "http://localhost"`" >> $GITHUB_OUTPUT
 
       # Image page: <https://hub.docker.com/r/postman/newman>,
       # CLI options: <https://www.npmjs.com/package/newman#command-line-options>
