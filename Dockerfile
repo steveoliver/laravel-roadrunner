@@ -80,8 +80,8 @@ RUN set -x \
         --gecos "" \
         "appuser" \
     # create directory for application sources
-    && mkdir -p /app /var/lib/nginx/logs/ \
-    && chown -R appuser:appuser /app /var/lib/nginx/logs/ \
+#    && mkdir -p /app /var/lib/nginx/logs/ \
+#    && chown -R appuser:appuser /app /var/lib/nginx/logs/ \
     # make clean up
     && docker-php-source delete \
     && apk del .build-deps \
@@ -91,7 +91,8 @@ RUN set -x \
 COPY .build/php-fpm/laravel.ini /usr/local/etc/php/conf.d/
 
 # copy composer (json|lock) files for dependencies layer caching
-COPY --chown=appuser:appuser ./composer.* /app/
+# COPY --chown=appuser:appuser ./composer.* /app/
+COPY ./composer.* /app/
 
 # load custom nginx.conf
 COPY .build/nginx/nginx.conf /etc/nginx/
@@ -113,7 +114,8 @@ ENV COMPOSER_HOME="/tmp/composer"
 RUN composer install -n --no-dev --no-cache --no-ansi --no-autoloader --no-scripts --prefer-dist
 
 # copy application sources into image (completely)
-COPY --chown=appuser:appuser . /app/
+# COPY --chown=appuser:appuser . /app/
+COPY . /app/
 
 RUN set -x \
     # generate composer autoloader and trigger scripts
@@ -127,7 +129,7 @@ RUN set -x \
 #    COPY --from=frontend --chown=appuser:appuser /app/public /app/public
 
 # use an unprivileged user by default
-USER appuser:appuser
+# USER appuser:appuser
 
 # unset default image entrypoint
 ENTRYPOINT []
