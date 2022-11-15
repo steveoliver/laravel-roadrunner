@@ -21,7 +21,14 @@ server:
   # Worker starting command, with any required arguments.
   #
   # This option is required.
-  command: "php ./vendor/bin/rr-worker start --relay-dsn unix:///var/run/rr/rr-relay.sock"
+  command: "php
+   -d zend_extension=xdebug
+   -d xdebug.mode=debug
+   -d xdebug.log=/tmp/xdebug.log
+   -d xdebug.trigger_value=PHPSTORM
+   -d xdebug.client_host=host.docker.internal
+   ./vendor/bin/rr-worker start
+   --relay-dsn unix:///var/run/rr/rr-relay.sock"
 
   ## Environment variables for the worker processes.
   ##
@@ -29,6 +36,12 @@ server:
   #env:
   #  - SOME_KEY: "SOME_VALUE"
   #  - SOME_KEY2: "SOME_VALUE2"
+  env:
+    # PHP_IDE_CONFIG servername must match IDE's server name.
+    - PHP_IDE_CONFIG: serverName=localhost
+    # TODO: Figure out how to get RoadRunner to pass request params
+    # to xdebug via worker. Currently, worker needs to set XDEBUG_SESSION
+    - XDEBUG_SESSION: PHPSTORM
 
   # Worker relay can be: "pipes", TCP (eg.: tcp://127.0.0.1:6001), or socket (eg.: unix:///var/run/rr-relay.sock).
   #
@@ -102,6 +115,11 @@ http:
 
   # Workers pool settings.
   pool:
+    # Debug mode for the pool. In this mode, pool will not pre-allocate the worker. Worker (only 1, num_workers ignored) will be allocated right after the request arrived.
+    #
+    # Default: false
+    debug: true
+
     # How many worker processes will be started. Zero (or nothing) means the number of logical CPUs.
     #
     # Default: 0
@@ -234,4 +252,4 @@ endure:
   # Logging level. Possible values: "debug", "info", "warning", "error", "panic", "fatal".
   #
   # Default: "error"
-  log_level: error
+  log_level: fatal

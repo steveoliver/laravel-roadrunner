@@ -1,0 +1,23 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Docker Compose" type="docker-deploy" factoryName="docker-compose.yml" server-name="Docker">
+    <deployment type="docker-compose.yml">
+      <settings>
+        <option name="envFilePath" value="" />
+        <option name="services">
+          <list>
+            <option value="web" />
+            <option value="queue" />
+            <option value="cron" />
+            <option value="mariadb" />
+            <option value="redis" />
+          </list>
+        </option>
+        <option name="sourceFilePath" value="docker-compose.yml" />
+        <upScaledServices>
+          <entry key="queue" value="2" />
+        </upScaledServices>
+      </settings>
+    </deployment>
+    <method v="2" />
+  </configuration>
+</component>
