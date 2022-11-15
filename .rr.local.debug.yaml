@@ -24,7 +24,6 @@ server:
   command: "php
    -d zend_extension=xdebug
    -d xdebug.mode=debug
-   -d xdebug.log=/tmp/xdebug.log
    -d xdebug.trigger_value=PHPSTORM
    -d xdebug.client_host=host.docker.internal
    ./vendor/bin/rr-worker start
