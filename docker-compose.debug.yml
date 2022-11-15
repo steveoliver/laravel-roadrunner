@@ -1,3 +1,9 @@
 services:
   web:
     command: rr serve -c .rr.local.debug.yaml
+    # When in 'debug' mode, this service will show as 'unhealthy'
+    # ...because healthcheck definition cannot be overriden.
+    # In our case, we just want to check the RPC service,
+    # since the http service will show no workers available
+    # ...which is what we want for debugging.
+    # See <https://github.com/docker/compose/issues/8962>
