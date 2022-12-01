@@ -14,7 +14,7 @@
         "laravel/tinker": "^2.7",
         "lkaemmerling/laravel-horizon-prometheus-exporter": "^1.5",
         "mll-lab/laravel-graphiql": "^1.0",
-        "nuwave/lighthouse": "^5.64",
+        "nuwave/lighthouse": "^5.67",
         "spiral/roadrunner-laravel": "^5.9"
     },
     "require-dev": {
