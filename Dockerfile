@@ -25,9 +25,16 @@ COPY --from=composer /usr/bin/composer /usr/bin/composer
 
 ENV COMPOSER_HOME="/tmp/composer"
 
+## Copy ZScaler Root CA cert
+COPY zscaler_root_ca.crt /usr/local/share/ca-certificates
+
+# Update CA certificates (with newly added ZScaler Root CA cert)
+RUN update-ca-certificates
+
 RUN set -x \
     # install permanent dependencies
     && apk add --no-cache \
+        linux-headers \
         postgresql-libs \
         mariadb-client \
         icu-libs \
@@ -46,34 +53,34 @@ RUN set -x \
         opcache \
         pcntl \
         intl \
-    && pecl install -o redis 1>/dev/null \
+    && pecl install -o redis \
     && echo 'extension=redis.so' > ${PHP_INI_DIR}/conf.d/redis.ini \
     # install xdebug extension (but do not enable it; only enable at runtime, as needed)
-    && pecl install -o xdebug 1>/dev/null \
+    && pecl install -o xdebug
     # install supercronic (for laravel task scheduling), project page: <https://github.com/aptible/supercronic>
-    && wget -q "https://github.com/aptible/supercronic/releases/download/v0.1.12/supercronic-linux-amd64" \
+RUN wget -q "https://github.com/aptible/supercronic/releases/download/v0.1.12/supercronic-linux-amd64" \
          -O /usr/bin/supercronic \
     && chmod +x /usr/bin/supercronic \
     && mkdir /etc/supercronic \
-    && echo '*/1 * * * * php /app/artisan schedule:run' > /etc/supercronic/laravel \
-    # generate self-signed SSL key and certificate files
-    && openssl req -x509 -nodes -days 1095 -newkey rsa:2048 \
+    && echo '*/1 * * * * php /app/artisan schedule:run' > /etc/supercronic/laravel
+# generate self-signed SSL key and certificate files
+RUN openssl req -x509 -nodes -days 1095 -newkey rsa:2048 \
         -subj "/C=CA/ST=QC/O=Company, Inc./CN=mydomain.com" \
         -addext "subjectAltName=DNS:mydomain.com" \
         -keyout /etc/ssl/private/selfsigned.key \
         -out /etc/ssl/certs/selfsigned.crt \
-    && chmod 644 /etc/ssl/private/selfsigned.key \
+    && chmod 644 /etc/ssl/private/selfsigned.key
     # make clean up
-    && docker-php-source delete \
+RUN docker-php-source delete \
     && apk del .build-deps \
-    && rm -R /tmp/pear \
+    && rm -R /tmp/pear
     # enable opcache for CLI and JIT, docs: <https://www.php.net/manual/en/opcache.configuration.php#ini.opcache.jit>
-    && echo -e "\nopcache.enable=1\nopcache.enable_cli=1\nopcache.jit_buffer_size=32M\nopcache.jit=1235\n" >> \
+RUN echo -e "\nopcache.enable=1\nopcache.enable_cli=1\nopcache.jit_buffer_size=32M\nopcache.jit=1235\n" >> \
         ${PHP_INI_DIR}/conf.d/docker-php-ext-opcache.ini \
     # show installed PHP modules
-    && php -m \
+    && php -m
     # create unprivileged user
-    && adduser \
+RUN adduser \
         --disabled-password \
         --shell "/sbin/nologin" \
         --home "/nonexistent" \

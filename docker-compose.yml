@@ -9,7 +9,7 @@ volumes:
 
 services:
   app: &app
-    image: steveoliver/laravel-roadrunner:v0.1.0
+    image: steveoliver/laravel-roadrunner:v0.1.1
     # build:
     #   context: .
     #   dockerfile: Dockerfile
@@ -28,6 +28,7 @@ services:
       DB_PASSWORD: forge
       DB_PORT: 3306
       QUEUE_CONNECTION: redis
+      OTEL_SPANS_URL: http://localhost:9412/api/v2/spans
     volumes:
       - /etc/passwd:/etc/passwd:ro
       - /etc/group:/etc/group:ro

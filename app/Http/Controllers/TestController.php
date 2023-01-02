@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Filesystem\Filesystem;
+use Spatie\OpenTelemetry\Facades\Measure;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 
@@ -89,6 +90,23 @@ class TestController extends \Illuminate\Routing\Controller
             'success' => false,
             'error'   => 'job processing timeout exceeded',
         ], 500);
+    }
+
+    public function trace(Request $request): JsonResponse
+    {
+        Measure::start('parent');
+        sleep(1);
+        Measure::start('child');
+
+        sleep(2);
+
+        Measure::stop('child');
+        sleep(3);
+        Measure::stop('parent');
+
+        return new JsonResponse([
+            'status' => 'success',
+        ]);
     }
 
     /**
