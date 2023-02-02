@@ -6,10 +6,11 @@ volumes:
   db-data: {}
   redis-data: {}
   tmp-data: {}
+  log-data: {}
 
 services:
   app: &app
-    image: steveoliver/laravel-roadrunner:v0.1.1
+    image: steveoliver/laravel-roadrunner:v0.1.2
     # build:
     #   context: .
     #   dockerfile: Dockerfile
@@ -20,6 +21,7 @@ services:
       APP_DEBUG: 'true'
       APP_ENV: local
       REDIS_HOST: redis
+      REDIS_PORT: 6379
       REDIS_PASSWORD: redis_password
       DB_CONNECTION: mysql
       DB_HOST: mariadb
@@ -28,12 +30,22 @@ services:
       DB_PASSWORD: forge
       DB_PORT: 3306
       QUEUE_CONNECTION: redis
-      OTEL_SPANS_URL: http://localhost:9412/api/v2/spans
+      LOG_CHANNEL: stack
+      LOG_LEVEL: debug
+      LOKI_ENTRYPOINT: http://loki:3100
+      LOKI_SYSTEM_NAME: laravel-roadrunner
+      LOKI_CONTEXT_PREFIX: context_
+      LOKI_EXTRA_PREFIX: extra_prefix_
+      ZIPKIN_HOST: grafana-agent
+      ZIPKIN_PORT: 9411
+      TRACING_DRIVER: zipkin
+      TRACING_SERVICE_NAME: laravel-roadrunner
     volumes:
       - /etc/passwd:/etc/passwd:ro
       - /etc/group:/etc/group:ro
       - tmp-data:/tmp:rw
       - .:/app:rw
+      - ./storage/logs:/app/storage/logs
     depends_on:
       mariadb: {condition: service_healthy}
       redis: {condition: service_healthy}
@@ -43,11 +55,20 @@ services:
     command: rr serve -c .rr.local.yaml
     ports:
       - '8080:8080/tcp'
+      - '8081:8081/tcp'
+      - '8082:8082/tcp'
       - '8443:8443/tcp'
+    # environment:
     healthcheck:
       test: ['CMD-SHELL', 'wget --spider -q "http://127.0.0.1:8082/health?plugin=http&plugin=rpc"']
       interval: 2s
       timeout: 2s
+
+#  app-logs:
+#    image: busybox
+#    command: /bin/sh -c tail -f /app/storage/logs/laravel.log
+#    volumes:
+#      - app-logs:/app/storage/logs:ro
 
   queue:
     <<: *app
@@ -86,3 +107,90 @@ services:
       test: ['CMD', 'redis-cli', 'ping']
       interval: 500ms
       timeout: 1s
+
+  promtail:
+    image: grafana/promtail:main
+    command: -config.file=/etc/promtail/config.yaml
+    volumes:
+      - ./promtail-config.yaml:/etc/promtail/config.yaml
+      - ./storage/logs:/app/storage/logs:ro
+      - ./zscaler_root_ca.crt:/etc/ssl/certs/ca-certificates.crt
+
+  grafana-agent:
+    image: grafana/agent:v0.30.1
+    # image: guildmortgage/grafana-agent:latest
+    ports:
+      - '4137/tcp'
+      - '4318/tcp'
+      - '8080/tcp'
+      - '9411/tcp'
+      - '9412/tcp'
+      - '12345/tcp'
+      - '12346/tcp'
+    volumes:
+      - ./grafana-agent-data:/etc/agent/data
+      - ./grafana-agent-config.yaml:/etc/agent/agent.yaml
+      # - ./zscaler_root_ca.crt:/etc/ssl/certs/ca-certificates.crt
+
+  tempo:
+    image: grafana/tempo:latest
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./tempo-local.yaml:/etc/tempo.yaml
+      - ./tempo-data:/tmp/tempo
+    ports:
+      - "3200"
+      - "14268"  # jaeger ingest
+      - "9411"   # zipkin ingest
+      - "4317"   # otel?
+    logging:
+      driver: loki
+      options:
+        loki-url: 'http://localhost:3100/loki/api/v1/push'
+
+  loki:
+    image: grafana/loki:2.6.1
+    command: [ "-config.file=/etc/loki/local-config.yaml" ]
+    ports:
+      - "3101:3100"                                   # loki needs to be exposed so it receives logs
+    environment:
+      - JAEGER_AGENT_HOST=tempo
+      - JAEGER_ENDPOINT=http://grafana-agent:14268/api/traces # send traces to Tempo
+#      - JAEGER_ENDPOINT=http://localhost:57391/api/traces # send traces to Tempo
+      - JAEGER_SAMPLER_TYPE=const
+      - JAEGER_SAMPLER_PARAM=1
+    logging:
+      driver: loki
+      options:
+        loki-url: 'http://localhost:3100/loki/api/v1/push'
+
+  prometheus:
+    image: prom/prometheus:latest
+    command:
+      - --config.file=/etc/prometheus.yaml
+      - --web.enable-remote-write-receiver
+      - --enable-feature=exemplar-storage
+    volumes:
+      - ./prometheus.yaml:/etc/prometheus.yaml
+    ports:
+      - "9091:9090"
+    logging:
+      driver: loki
+      options:
+        loki-url: 'http://localhost:3100/loki/api/v1/push'
+
+  grafana:
+    image: grafana/grafana:9.3.0
+    volumes:
+      - ./grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    ports:
+      - "3001:3000"
+    logging:
+      driver: loki
+      options:
+        loki-url: 'http://localhost:3100/loki/api/v1/push'
+#

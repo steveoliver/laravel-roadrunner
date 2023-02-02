@@ -1,5 +1,5 @@
 {
-    "name": "tarampampam/laravel-roadrunner-in-docker",
+    "name": "steveoliver/laravel-roadrunner",
     "type": "project",
     "description": "Sample Laravel application with RoadRunner in Docker Container",
     "keywords": ["laravel", "roadrunner"],
@@ -15,8 +15,9 @@
         "lkaemmerling/laravel-horizon-prometheus-exporter": "^1.5",
         "mll-lab/laravel-graphiql": "^1.0",
         "nuwave/lighthouse": "^5.64",
-        "spatie/laravel-open-telemetry": "^0.0.3",
-        "spiral/roadrunner-laravel": "^5.9"
+        "petert82/monolog-logfmt": "^2.1",
+        "spiral/roadrunner-laravel": "^5.9",
+        "vinelab/tracing-laravel": "^2.2"
     },
     "require-dev": {
         "spatie/laravel-ignition": "^1.6",
@@ -59,8 +60,7 @@
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
-        "sort-packages": true,
-        "disable-tls": true
+        "sort-packages": true
     },
     "prefer-stable": true
 }

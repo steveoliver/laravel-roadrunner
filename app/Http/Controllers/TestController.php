@@ -5,15 +5,17 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Filesystem\Filesystem;
-use Spatie\OpenTelemetry\Facades\Measure;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
+use Vinelab\Tracing\Facades\Trace;
+use Vinelab\Tracing\Propagation\Formats;
 
 /**
  * @internal   Just for a test
@@ -28,6 +30,8 @@ class TestController extends \Illuminate\Routing\Controller
      */
     public function database(): JsonResponse
     {
+        Log::info('Processing request to connect to the database with User operations');
+
         $started_at    = \microtime(true);
         $memory_bytes  = \memory_get_usage();
         $random_string = Str::random();
@@ -68,6 +72,10 @@ class TestController extends \Illuminate\Routing\Controller
      */
     public function queue(Dispatcher $dispatcher, CacheRepository $cache): JsonResponse
     {
+        Log::info('Processing request to test the queue', [
+            'steve' => 'oliver',
+        ]);
+
         $started_at    = \microtime(true);
         $memory_bytes  = \memory_get_usage();
         $random_string = Str::random();
@@ -94,15 +102,33 @@ class TestController extends \Illuminate\Routing\Controller
 
     public function trace(Request $request): JsonResponse
     {
-        Measure::start('parent');
-        sleep(1);
-        Measure::start('child');
+        $rootSpan = Trace::getCurrentSpan();
 
-        sleep(2);
+        Log::info('Processing request to trace Laravel request', [
+            'TraceID' => $rootSpan->getContext()->getRawContext()->getTraceId(),
+        ]);
 
-        Measure::stop('child');
-        sleep(3);
-        Measure::stop('parent');
+        $span = Trace::startSpan('First thing', $rootSpan->getContext());
+        // usleep(100);
+        // sleep(3);
+        $span->annotate('Starting');
+        $span->annotate('Logging');
+        Log::debug("slept for 1 second");
+        $span->annotate('Logged');
+        $span->annotate('Finishing');
+        $span->finish();
+
+        $span = Trace::startSpan('Second thing', $rootSpan->getContext());
+        // usleep(200);
+        $span->annotate('Slept for 2 seconds');
+        Log::debug("slept for 2 seconds");
+        $span->finish();
+
+        $span = Trace::startSpan('Third thing', $rootSpan->getContext());
+        // usleep(300);
+        $span->annotate('Slept for 3 seconds');
+        Log::debug("slept for 3 seconds");
+        $span->finish();
 
         return new JsonResponse([
             'status' => 'success',
@@ -118,6 +144,7 @@ class TestController extends \Illuminate\Routing\Controller
      */
     public function dump(Request $request): JsonResponse
     {
+        Log::debug('Processing request to dump Laravel context');
         $memory_bytes = \memory_get_usage();
 
         $response_data = [
@@ -166,8 +193,12 @@ class TestController extends \Illuminate\Routing\Controller
      */
     public function url(UrlGenerator $url): JsonResponse
     {
+        Log::debug('Processing request to show URL and routing information.', [
+            'url_generator' => $url->to('/'),
+        ]);
         return new JsonResponse([
             'success'  => true,
+            'foo' => 'bar',
             'base_url' => [
                 'url_generator' => $url->to('/'),
                 'facade'        => \Illuminate\Support\Facades\URL::to('/'),

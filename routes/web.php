@@ -36,4 +36,7 @@ Route::prefix('test')->group(static function () {
 
     Route::get('/url', [\App\Http\Controllers\TestController::class, 'url'])
         ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+
+    Route::get('/trace', [\App\Http\Controllers\TestController::class, 'trace'])
+        ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 });

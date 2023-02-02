@@ -115,7 +115,7 @@ http:
     # Timeout for worker allocation. Zero means no limit.
     #
     # Default: 60s
-    allocate_timeout: 10s
+    allocate_timeout: 30s
 
     # Timeout for worker destroying before process killing. Zero means no limit.
     #
@@ -172,11 +172,11 @@ http:
 
 ## Application metrics in Prometheus format (docs: https://roadrunner.dev/docs/beep-beep-metrics). Drop this section
 ## for this feature disabling.
-#metrics:
-#  # Prometheus client address (path /metrics added automatically).
-#  #
-#  # Default: "127.0.0.1:2112"
-#  address: 127.0.0.1:8081
+metrics:
+  # Prometheus client address (path /metrics added automatically).
+  #
+  # Default: "127.0.0.1:2112"
+  address: 0.0.0.0:8081
 
 # Health check endpoint (docs: https://roadrunner.dev/docs/beep-beep-health). If response code is 200 - it means at
 # least one worker ready to serve requests. 500 - there are no workers ready to service requests.
@@ -234,4 +234,4 @@ endure:
   # Logging level. Possible values: "debug", "info", "warning", "error", "panic", "fatal".
   #
   # Default: "error"
-  log_level: error
+  log_level: info
