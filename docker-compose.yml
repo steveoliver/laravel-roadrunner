@@ -32,10 +32,6 @@ services:
       QUEUE_CONNECTION: redis
       LOG_CHANNEL: stack
       LOG_LEVEL: debug
-      LOKI_ENTRYPOINT: http://loki:3100
-      LOKI_SYSTEM_NAME: laravel-roadrunner
-      LOKI_CONTEXT_PREFIX: context_
-      LOKI_EXTRA_PREFIX: extra_prefix_
       ZIPKIN_HOST: grafana-agent
       ZIPKIN_PORT: 9411
       TRACING_DRIVER: zipkin
