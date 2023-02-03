@@ -3,17 +3,25 @@
 namespace App\Logging;
 
 use Vinelab\Tracing\Facades\Trace;
+use Zipkin\Propagation\TraceContext;
 
 class TraceContextProcessor
 {
+    /**
+     * @param array<string, mixed> $record
+     * @return array<string, mixed>
+     */
     public function __invoke(array $record): array
     {
-        $currentSpan = Trace::getCurrentSpan()->getContext()->getRawContext();
+        /** @var TraceContext $traceContext */
+        $traceContext = Trace::getCurrentSpan()->getContext()->getRawContext();
 
-        $record['extra'] = [
-            'TraceID' => $currentSpan->getTraceId(),
-            'SpanID' => $currentSpan->getSpanId(),
-        ];
+        if ($traceContext instanceof TraceContext) {
+            $record['extra'] = [
+                'TraceID' => $traceContext->getTraceId(),
+                'SpanID' => $traceContext->getSpanId(),
+            ];
+        }
 
         return $record;
     }

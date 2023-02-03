@@ -15,6 +15,7 @@ class CustomizeFormatter
      */
     public function __invoke(Logger $logger): void
     {
+        /** @phpstan-ignore-next-line */
         foreach ($logger->getHandlers() as $handler) {
             $handler->pushProcessor(new TraceContextProcessor());
             $handler->setFormatter(new LogfmtFormatter());
