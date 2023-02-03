@@ -19,7 +19,7 @@ server:
   # Worker starting command, with any required arguments.
   #
   # This option is required.
-  command: "php ./vendor/bin/rr-worker start"
+  command: "php /app/vendor/bin/rr-worker start"
 
   ## Environment variables for the worker processes.
   ##
@@ -33,7 +33,7 @@ server:
   # Default: "pipes"
   #relay: "unix:///var/run/rr/rr-relay.sock"
   relay: "pipes"
-  
+
   # Timeout for relay connection establishing (only for socket and TCP port relay).
   #
   # Default: 60s
@@ -124,7 +124,7 @@ http:
     # Maximal count of worker executions. Zero (or nothing) means no limit.
     #
     # Default: 0
-    max_jobs: 64
+    max_jobs: 0
 
     # Timeout for worker allocation. Zero means no limit.
     #
@@ -143,7 +143,7 @@ http:
       # Maximal worker memory usage in megabytes (soft limit). Zero means no limit.
       #
       # Default: 0
-      max_worker_memory: 128
+      max_worker_memory: 0
 
       # Maximal job lifetime (hard limit). Zero means no limit.
       #

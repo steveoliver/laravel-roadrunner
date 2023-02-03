@@ -1,0 +1,14 @@
+global:
+  scrape_interval:     1s
+  evaluation_interval: 1s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: [ 'localhost:9090' ]
+  - job_name: 'tempo'
+    static_configs:
+      - targets: [ 'tempo:3200' ]
+  - job_name: 'web'
+    static_configs:
+      - targets: [ 'web:8081' ]

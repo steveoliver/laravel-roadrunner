@@ -1,0 +1,23 @@
+metrics:
+  configs:
+    - name: default
+      scrape_configs:
+        - job_name: local_scrape
+          static_configs:
+            - targets: ['127.0.0.1:12345']
+      remote_write:
+        - url: http://prometheus:9091/api/v1/write
+traces:
+  configs:
+    - name: default
+      receivers:
+        zipkin:
+        otlp:
+          protocols:
+            grpc:
+            http:
+      remote_write:
+        - endpoint: tempo:4317
+          insecure: true
+      service_graphs:
+        enabled: true

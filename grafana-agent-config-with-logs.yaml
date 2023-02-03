@@ -1,0 +1,27 @@
+
+traces:
+  configs:
+    - name: default
+      receivers:
+        zipkin:
+        otlp:
+          protocols:
+            grpc:
+            http:
+      remote_write:
+        - endpoint: tempo:4317
+          insecure: true
+logs:
+  config:
+    - name: default
+      clients:
+        - url: http://loki:3100/loki/api/v1/push
+      positions:
+        filename: /tmp/positions.yaml
+        scrape_configs:
+          - job_name: system
+            static_configs:
+              - targets: [localhost]
+                labels:
+                  job: varlogs
+                  __path__: /var/log/*.log
