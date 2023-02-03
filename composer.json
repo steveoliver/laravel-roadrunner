@@ -9,7 +9,7 @@
         "fruitcake/laravel-cors": "^3.0.0",
         "guzzlehttp/guzzle": "^7.5.0",
         "laravel/framework": "^9.37",
-        "laravel/horizon": "^5.10",
+        "laravel/horizon": "^5.14",
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7",
         "lkaemmerling/laravel-horizon-prometheus-exporter": "^1.5",
