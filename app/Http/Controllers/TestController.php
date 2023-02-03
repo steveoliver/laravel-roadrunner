@@ -104,30 +104,30 @@ class TestController extends \Illuminate\Routing\Controller
     {
         $rootSpan = Trace::getCurrentSpan();
 
-        Log::info('Processing request to trace Laravel request', [
-            'TraceID' => $rootSpan->getContext()->getRawContext()->getTraceId(),
-        ]);
+        Log::info('Tracing Laravel request');
 
         $span = Trace::startSpan('First thing', $rootSpan->getContext());
-        // usleep(100);
-        // sleep(3);
-        $span->annotate('Starting');
-        $span->annotate('Logging');
-        Log::debug("slept for 1 second");
-        $span->annotate('Logged');
-        $span->annotate('Finishing');
+        sleep(1);
+        Log::debug("Slept for 1 second");
+        $span->annotate('Annotating something in the middle of the span');
+        sleep(1);
+        Log::debug("Slept again for 1 second");
         $span->finish();
 
         $span = Trace::startSpan('Second thing', $rootSpan->getContext());
-        // usleep(200);
-        $span->annotate('Slept for 2 seconds');
-        Log::debug("slept for 2 seconds");
+        sleep(2);
+        Log::debug("Slept for 2 seconds");
+        $span->annotate('Annotating something in the middle of the span');
+        sleep(2);
+        Log::debug("Slept again for 2 seconds");
         $span->finish();
 
         $span = Trace::startSpan('Third thing', $rootSpan->getContext());
-        // usleep(300);
-        $span->annotate('Slept for 3 seconds');
-        Log::debug("slept for 3 seconds");
+        sleep(3);
+        Log::debug("Slept for 3 seconds");
+        $span->annotate('Annotating something in the middle of the span');
+        sleep(3);
+        Log::debug("Slept again for 3 seconds");
         $span->finish();
 
         return new JsonResponse([
