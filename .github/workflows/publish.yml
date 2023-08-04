@@ -22,7 +22,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v3
         with:
-          images: steveoliver/laravel-roadrunner
+          images: circatree/loc
       
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
